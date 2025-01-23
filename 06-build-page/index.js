@@ -29,3 +29,28 @@ async function copyAssets(src, dest) {
 }
 
 copyAssets(assetsPath, distAssetsPath);
+
+// adding styles in styles.css
+async function bundleStyles() {
+  try {
+    const files = await fs.readdir(stylesPath);
+    const styleOutputPath = path.join(projectDist, 'style.css');
+    const writeStream = await fs.open(styleOutputPath, 'w');
+
+    for (const file of files) {
+      const filePath = path.join(stylesPath, file);
+      const fileExt = path.extname(file);
+
+      if (fileExt === '.css') {
+        const content = await fs.readFile(filePath, 'utf-8');
+        await writeStream.write(content + '\n');
+      }
+    }
+
+    await writeStream.close();
+  } catch (err) {
+    console.error('Error when creating style.css:', err);
+  }
+}
+
+bundleStyles();
