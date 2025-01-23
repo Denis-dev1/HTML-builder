@@ -28,8 +28,6 @@ async function copyAssets(src, dest) {
   }
 }
 
-copyAssets(assetsPath, distAssetsPath);
-
 // adding styles in styles.css
 async function bundleStyles() {
   try {
@@ -52,8 +50,6 @@ async function bundleStyles() {
     console.error('Error when creating style.css:', err);
   }
 }
-
-bundleStyles();
 
 // creating index.html
 async function buildHTML() {
@@ -83,4 +79,26 @@ async function buildHTML() {
   }
 }
 
-buildHTML();
+async function createProjectDist() {
+  try {
+    // 1. creating folder project-dist
+    await fs.rm(projectDist, { recursive: true, force: true });
+    await fs.mkdir(projectDist, { recursive: true });
+
+    // 2. creating index.html
+    await buildHTML();
+
+    // 3. adding styles in styles.css
+    await bundleStyles();
+
+    // 4. Copy assets folder
+    await copyAssets(assetsPath, distAssetsPath);
+
+    console.log('The project was successfully built!');
+  } catch (err) {
+    console.error('Project building error:', err);
+  }
+}
+
+// doing all together
+createProjectDist();
