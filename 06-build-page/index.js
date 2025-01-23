@@ -54,3 +54,33 @@ async function bundleStyles() {
 }
 
 bundleStyles();
+
+// creating index.html
+async function buildHTML() {
+  try {
+    let templateContent = await fs.readFile(templatePath, 'utf-8');
+
+    const componentFiles = await fs.readdir(componentsPath);
+    for (const file of componentFiles) {
+      const filePath = path.join(componentsPath, file);
+      const fileExt = path.extname(file);
+      const componentName = path.basename(file, fileExt);
+
+      if (fileExt === '.html') {
+        const componentContent = await fs.readFile(filePath, 'utf-8');
+        const placeholder = `{{${componentName}}}`;
+        templateContent = templateContent.replaceAll(
+          placeholder,
+          componentContent,
+        );
+      }
+    }
+
+    const outputPath = path.join(projectDist, 'index.html');
+    await fs.writeFile(outputPath, templateContent, 'utf-8');
+  } catch (err) {
+    console.error('Error building index.html:', err);
+  }
+}
+
+buildHTML();
